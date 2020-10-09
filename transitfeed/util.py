@@ -26,7 +26,7 @@ import re
 import socket
 import sys
 import time
-import urllib2
+import urllib
 
 from . import errors
 from .version import __version__

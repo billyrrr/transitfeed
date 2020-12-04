@@ -32,7 +32,7 @@
 # This is very simple example which you could use as a base for your own
 # transit feed builder.
 
-from __future__ import print_function
+
 import transitfeed
 from optparse import OptionParser
 import re

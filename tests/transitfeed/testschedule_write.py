@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Unit tests for the schedule module.
-from __future__ import absolute_import
+
 
 from tests import util
 import transitfeed
@@ -52,7 +52,7 @@ class MinimalWriteTestCase(util.TempFileTestCaseBase):
 
     stop1 = transitfeed.Stop()
     stop1.stop_id = "STOP1"
-    stop1.stop_name = u'Stop 1 acute letter e\202'
+    stop1.stop_name = 'Stop 1 acute letter e\202'
     stop1.stop_lat = 78.243587
     stop1.stop_lon = 32.258937
     schedule.AddStopObject(stop1)
@@ -84,9 +84,9 @@ class ScheduleBuilderTestCase(util.TempFileTestCaseBase):
     stop1 = schedule.AddStop(lng=140, lat=48.2, name="\xc8\x8b hub")
     # "u020b i with inverted accent breve" as unicode string
     stop2 = schedule.AddStop(lng=140.001, lat=48.201,
-                             name=u"remote \u020b station")
-    route = schedule.AddRoute(u"\u03b2", "Beta", "Bus")
-    trip = route.AddTrip(schedule, u"to remote \u020b station")
+                             name="remote \u020b station")
+    route = schedule.AddRoute("\u03b2", "Beta", "Bus")
+    trip = route.AddTrip(schedule, "to remote \u020b station")
     repr(stop1)
     repr(stop2)
     repr(route)
@@ -99,11 +99,11 @@ class ScheduleBuilderTestCase(util.TempFileTestCaseBase):
     read_schedule = \
         transitfeed.Loader(self.tempfilepath, problems=problems,
                            extra_validation=True).Load()
-    self.assertEquals(u'\u020b Fly Agency',
+    self.assertEqual('\u020b Fly Agency',
                       read_schedule.GetDefaultAgency().agency_name)
-    self.assertEquals(u'\u03b2',
+    self.assertEqual('\u03b2',
                       read_schedule.GetRoute(route.route_id).route_short_name)
-    self.assertEquals(u'to remote \u020b station',
+    self.assertEqual('to remote \u020b station',
                       read_schedule.GetTrip(trip.trip_id).trip_headsign)
 
   def testBuildSimpleFeed(self):
@@ -372,7 +372,7 @@ class WriteSampleFeedTestCase(util.TempFileTestCaseBase):
                   ("16:00:00", "16:00:00", "BEATTY_AIRPORT", None, None, None, None)],
       }
 
-    for trip_id, stop_time_list in stop_time_data.items():
+    for trip_id, stop_time_list in list(stop_time_data.items()):
       for stop_time_entry in stop_time_list:
         (arrival_time, departure_time, stop_id, shape_dist_traveled,
             pickup_type, drop_off_type, stop_headsign) = stop_time_entry
@@ -487,7 +487,7 @@ class WriteSampleFeedTestCase(util.TempFileTestCaseBase):
       self.assertEqual(headway_trips[trip_id],
                        read_schedule.GetTrip(trip_id).GetFrequencyTuples())
 
-    for trip_id, stop_time_list in stop_time_data.items():
+    for trip_id, stop_time_list in list(stop_time_data.items()):
       trip = read_schedule.GetTrip(trip_id)
       read_stoptimes = trip.GetStopTimes()
       self.assertEqual(len(read_stoptimes), len(stop_time_list))

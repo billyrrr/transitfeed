@@ -15,9 +15,9 @@
 # limitations under the License.
 
 # Unit tests for the route module.
-from __future__ import absolute_import
 
-from StringIO import StringIO
+
+from io import StringIO
 from tests import util
 import transitfeed
 
@@ -115,8 +115,8 @@ class RouteConstructorTestCase(util.TestCase):
     repr(route)
     route.Validate(self.problems)
     self.accumulator.AssertNoMoreExceptions()
-    self.assertEquals(3, route.route_type)  # converted to an int
-    self.assertEquals({'route_id': 'id1', 'route_short_name': '22',
+    self.assertEqual(3, route.route_type)  # converted to an int
+    self.assertEqual({'route_id': 'id1', 'route_short_name': '22',
                        'route_type': '3'}, dict(route))
 
     # route_type as an int
@@ -124,8 +124,8 @@ class RouteConstructorTestCase(util.TestCase):
     repr(route)
     route.Validate(self.problems)
     self.accumulator.AssertNoMoreExceptions()
-    self.assertEquals(1, route.route_type)  # kept as an int
-    self.assertEquals({'route_id': 'i1', 'route_long_name': 'Twenty 2',
+    self.assertEqual(1, route.route_type)  # kept as an int
+    self.assertEqual({'route_id': 'i1', 'route_long_name': 'Twenty 2',
                        'route_type': '1'}, dict(route))
 
     # route_type as a string
@@ -133,8 +133,8 @@ class RouteConstructorTestCase(util.TestCase):
     repr(route)
     route.Validate(self.problems)
     self.accumulator.AssertNoMoreExceptions()
-    self.assertEquals(1, route.route_type)  # converted to an int
-    self.assertEquals({'route_id': 'id1', 'route_short_name': '22',
+    self.assertEqual(1, route.route_type)  # converted to an int
+    self.assertEqual({'route_id': 'id1', 'route_short_name': '22',
                        'route_type': '1'}, dict(route))
 
     # route_type has undefined int value
@@ -146,7 +146,7 @@ class RouteConstructorTestCase(util.TestCase):
     self.assertEqual('route_type', e.column_name)
     self.assertEqual(1, e.type)
     self.accumulator.AssertNoMoreExceptions()
-    self.assertEquals({'route_id': 'id1', 'route_short_name': '22',
+    self.assertEqual({'route_id': 'id1', 'route_short_name': '22',
                        'route_type': '8'}, dict(route))
 
     # route_type that doesn't parse
@@ -157,7 +157,7 @@ class RouteConstructorTestCase(util.TestCase):
     e = self.accumulator.PopException('InvalidValue')
     self.assertEqual('route_type', e.column_name)
     self.accumulator.AssertNoMoreExceptions()
-    self.assertEquals({'route_id': 'id1', 'route_short_name': '22',
+    self.assertEqual({'route_id': 'id1', 'route_short_name': '22',
                        'route_type': '1foo'}, dict(route))
 
     # agency_id
@@ -166,26 +166,26 @@ class RouteConstructorTestCase(util.TestCase):
     repr(route)
     route.Validate(self.problems)
     self.accumulator.AssertNoMoreExceptions()
-    self.assertEquals({'route_id': 'id1', 'route_short_name': '22',
+    self.assertEqual({'route_id': 'id1', 'route_short_name': '22',
                        'route_type': '1', 'agency_id': 'myage'}, dict(route))
 
   def testInitArgOrder(self):
     """Call Route.__init__ without any names so a change in order is noticed."""
     route = transitfeed.Route('short', 'long name', 'Bus', 'r1', 'a1')
-    self.assertEquals({'route_id': 'r1', 'route_short_name': 'short',
+    self.assertEqual({'route_id': 'r1', 'route_short_name': 'short',
                        'route_long_name': 'long name',
                        'route_type': '3', 'agency_id': 'a1'}, dict(route))
 
   def testFieldDict(self):
     route = transitfeed.Route(field_dict={})
-    self.assertEquals({}, dict(route))
+    self.assertEqual({}, dict(route))
 
     route = transitfeed.Route(field_dict={
       'route_id': 'id1', 'route_short_name': '22', 'agency_id': 'myage',
       'route_type': '1', 'bikes_allowed': '1'})
     route.Validate(self.problems)
     self.accumulator.AssertNoMoreExceptions()
-    self.assertEquals(
+    self.assertEqual(
         {'route_id': 'id1', 'route_short_name': '22', 'agency_id': 'myage',
          'route_type': '1', 'bikes_allowed': '1'},
         dict(route))
@@ -195,12 +195,12 @@ class RouteConstructorTestCase(util.TestCase):
       'route_type': '1', 'my_column': 'v'})
     route.Validate(self.problems)
     self.accumulator.AssertNoMoreExceptions()
-    self.assertEquals({'route_id': 'id1', 'route_short_name': '22',
+    self.assertEqual({'route_id': 'id1', 'route_short_name': '22',
                        'agency_id': 'myage', 'route_type': '1',
                        'my_column':'v'}, dict(route))
     route._private = 0.3  # Isn't copied
     route_copy = transitfeed.Route(field_dict=route)
-    self.assertEquals({'route_id': 'id1', 'route_short_name': '22',
+    self.assertEqual({'route_id': 'id1', 'route_short_name': '22',
                        'agency_id': 'myage', 'route_type': '1',
                        'my_column':'v'}, dict(route_copy))
 

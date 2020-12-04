@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Unit tests for the schedule module.
-from __future__ import absolute_import
+
 
 from datetime import date
 import re
@@ -190,7 +190,7 @@ class OverlappingBlockTripsTestCase(util.TestCase):
     # If service period overlap calculation caching is working correctly,
     # we expect only two calls to GetServicePeriod(), one each for sp1 and
     # sp2, as oppossed four calls total for the four overlapping trips
-    self.assertEquals(2, schedule.GetServicePeriodCallCount())
+    self.assertEqual(2, schedule.GetServicePeriodCallCount())
 
   def testNoOverlapDifferentServicePeriods(self):
 
@@ -335,11 +335,11 @@ class NoServiceExceptionsTestCase(util.MemoryZipTestCase):
 class GetServicePeriodsActiveEachDateTestCase(util.TestCase):
   def testEmpty(self):
     schedule = transitfeed.Schedule()
-    self.assertEquals(
+    self.assertEqual(
         [],
         schedule.GetServicePeriodsActiveEachDate(date(2009, 1, 1),
                                                  date(2009, 1, 1)))
-    self.assertEquals(
+    self.assertEqual(
         [(date(2008, 12, 31), []), (date(2009, 1, 1), [])],
         schedule.GetServicePeriodsActiveEachDate(date(2008, 12, 31),
                                                  date(2009, 1, 2)))
@@ -350,11 +350,11 @@ class GetServicePeriodsActiveEachDateTestCase(util.TestCase):
     sp1.SetDateHasService("20090101")
     sp1.SetDateHasService("20090102")
     schedule.AddServicePeriodObject(sp1)
-    self.assertEquals(
+    self.assertEqual(
         [],
         schedule.GetServicePeriodsActiveEachDate(date(2009, 1, 1),
                                                  date(2009, 1, 1)))
-    self.assertEquals(
+    self.assertEqual(
         [(date(2008, 12, 31), []), (date(2009, 1, 1), [sp1])],
         schedule.GetServicePeriodsActiveEachDate(date(2008, 12, 31),
                                                  date(2009, 1, 2)))
@@ -374,16 +374,16 @@ class GetServicePeriodsActiveEachDateTestCase(util.TestCase):
     sp2.SetWeekendService()
     sp2.SetWeekdayService()
     schedule.AddServicePeriodObject(sp2)
-    self.assertEquals(
+    self.assertEqual(
         [],
         schedule.GetServicePeriodsActiveEachDate(date(2009, 1, 1),
                                                  date(2009, 1, 1)))
     date_services = schedule.GetServicePeriodsActiveEachDate(date(2008, 12, 31),
                                                              date(2009, 1, 2))
-    self.assertEquals(
+    self.assertEqual(
         [date(2008, 12, 31), date(2009, 1, 1)], [d for d, _ in date_services])
-    self.assertEquals(set([sp1, sp2]), set(date_services[0][1]))
-    self.assertEquals([sp1], date_services[1][1])
+    self.assertEqual(set([sp1, sp2]), set(date_services[0][1]))
+    self.assertEqual([sp1], date_services[1][1])
 
 
 class DuplicateTripTestCase(util.ValidationTestCase):
@@ -904,9 +904,9 @@ class ServiceGapsTestCase(util.MemoryZipTestCase):
     self.schedule.Validate(today=date(2009, 7, 17),
                            service_gap_interval=13)
     exception = self.accumulator.PopException("TooManyDaysWithoutService")
-    self.assertEquals(date(2009, 7, 5),
+    self.assertEqual(date(2009, 7, 5),
                       exception.first_day_without_service)
-    self.assertEquals(date(2009, 7, 17),
+    self.assertEqual(date(2009, 7, 17),
                       exception.last_day_without_service)
 
     self.AssertCommonExceptions(date(2010, 6, 25))
@@ -926,9 +926,9 @@ class ServiceGapsTestCase(util.MemoryZipTestCase):
 
     # This service gap is the one between FULLW and WE
     exception = self.accumulator.PopException("TooManyDaysWithoutService")
-    self.assertEquals(date(2009, 6, 11),
+    self.assertEqual(date(2009, 6, 11),
                       exception.first_day_without_service)
-    self.assertEquals(date(2009, 7, 17),
+    self.assertEqual(date(2009, 7, 17),
                       exception.last_day_without_service)
     # The one-year period ends before the June 2010 gap, so that last
     # service gap should _not_ be found
@@ -941,9 +941,9 @@ class ServiceGapsTestCase(util.MemoryZipTestCase):
 
     # This service gap is the one between FULLW and WE
     exception = self.accumulator.PopException("TooManyDaysWithoutService")
-    self.assertEquals(date(2009, 6, 11),
+    self.assertEqual(date(2009, 6, 11),
                       exception.first_day_without_service)
-    self.assertEquals(date(2009, 7, 17),
+    self.assertEqual(date(2009, 7, 17),
                       exception.last_day_without_service)
 
     self.AssertCommonExceptions(date(2010, 6, 21))
@@ -955,9 +955,9 @@ class ServiceGapsTestCase(util.MemoryZipTestCase):
     self.schedule.Validate(today=date(2009, 6, 30),
                            service_gap_interval=13)
     exception = self.accumulator.PopException("TooManyDaysWithoutService")
-    self.assertEquals(date(2009, 6, 18),
+    self.assertEqual(date(2009, 6, 18),
                       exception.first_day_without_service)
-    self.assertEquals(date(2009, 7, 17),
+    self.assertEqual(date(2009, 7, 17),
                       exception.last_day_without_service)
 
     self.AssertCommonExceptions(date(2010, 6, 25))
@@ -966,22 +966,22 @@ class ServiceGapsTestCase(util.MemoryZipTestCase):
   # and which are common to all the tests
   def AssertCommonExceptions(self, last_exception_date):
     exception = self.accumulator.PopException("TooManyDaysWithoutService")
-    self.assertEquals(date(2009, 8, 10),
+    self.assertEqual(date(2009, 8, 10),
                       exception.first_day_without_service)
-    self.assertEquals(date(2009, 8, 22),
+    self.assertEqual(date(2009, 8, 22),
                       exception.last_day_without_service)
 
     exception = self.accumulator.PopException("TooManyDaysWithoutService")
-    self.assertEquals(date(2009, 12, 28),
+    self.assertEqual(date(2009, 12, 28),
                       exception.first_day_without_service)
-    self.assertEquals(date(2010, 1, 15),
+    self.assertEqual(date(2010, 1, 15),
                       exception.last_day_without_service)
 
     if last_exception_date is not None:
       exception = self.accumulator.PopException("TooManyDaysWithoutService")
-      self.assertEquals(date(2010, 6, 7),
+      self.assertEqual(date(2010, 6, 7),
                         exception.first_day_without_service)
-      self.assertEquals(last_exception_date,
+      self.assertEqual(last_exception_date,
                         exception.last_day_without_service)
 
     self.accumulator.AssertNoMoreExceptions()

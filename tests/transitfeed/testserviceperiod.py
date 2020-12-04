@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Unit tests for the serviceperiod module.
-from __future__ import absolute_import
+
 
 import datetime
 from datetime import date
@@ -139,7 +139,7 @@ class ServicePeriodValidationTestCase(util.ValidationTestCase):
     period3.day_of_week[5] = True
     period3.Validate(self.problems)
     e = self.accumulator.PopDateOutsideValidRange('start_date')
-    self.assertEquals('18990101', e.value)
+    self.assertEqual('18990101', e.value)
     e.FormatProblem() #should not throw any exceptions
     e.FormatContext() #should not throw any exceptions
     e = self.accumulator.PopDateOutsideValidRange('end_date')
@@ -258,7 +258,7 @@ class ServicePeriodTestCase(util.TestCase):
     self.assertTrue(period.IsActiveOn('20080102'))
     self.assertTrue(period.IsActiveOn('20080102', date(2008, 1, 2)))
 
-    self.assertEquals(period.ActiveDates(),
+    self.assertEqual(period.ActiveDates(),
                       ['20071226', '20071227', '20071228', '20071230',
                        '20080102'])
 
@@ -275,7 +275,7 @@ class ServicePeriodTestCase(util.TestCase):
     self.assertTrue(period_dates.IsActiveOn('20071230', date(2007, 12, 30)))
     self.assertFalse(period_dates.IsActiveOn('20071231'))
     self.assertFalse(period_dates.IsActiveOn('20071231', date(2007, 12, 31)))
-    self.assertEquals(period_dates.ActiveDates(), ['20071230'])
+    self.assertEqual(period_dates.ActiveDates(), ['20071230'])
 
     # Test with an invalid ServicePeriod; one of start_date, end_date is set
     period_no_end = transitfeed.ServicePeriod()
@@ -283,17 +283,17 @@ class ServicePeriodTestCase(util.TestCase):
     self.assertFalse(period_no_end.IsActiveOn(date='20071231'))
     self.assertFalse(period_no_end.IsActiveOn(date='20071231',
                                               date_object=date(2007, 12, 31)))
-    self.assertEquals(period_no_end.ActiveDates(), [])
+    self.assertEqual(period_no_end.ActiveDates(), [])
     period_no_start = transitfeed.ServicePeriod()
     period_no_start.end_date = '20071230'
     self.assertFalse(period_no_start.IsActiveOn('20071229'))
     self.assertFalse(period_no_start.IsActiveOn('20071229', date(2007, 12, 29)))
-    self.assertEquals(period_no_start.ActiveDates(), [])
+    self.assertEqual(period_no_start.ActiveDates(), [])
 
     period_empty = transitfeed.ServicePeriod()
     self.assertFalse(period_empty.IsActiveOn('20071231'))
     self.assertFalse(period_empty.IsActiveOn('20071231', date(2007, 12, 31)))
-    self.assertEquals(period_empty.ActiveDates(), [])
+    self.assertEqual(period_empty.ActiveDates(), [])
 
 
 class OnlyCalendarDatesTestCase(util.LoadTestCase):
@@ -313,8 +313,8 @@ class DuplicateServiceIdDateWarningTestCase(util.MemoryZipTestCase):
         'FULLW,20100604,2\n')
     schedule = self.MakeLoaderAndLoad()
     e = self.accumulator.PopException('DuplicateID')
-    self.assertEquals('(service_id, date)', e.column_name)
-    self.assertEquals('(FULLW, 20100604)', e.value)
+    self.assertEqual('(service_id, date)', e.column_name)
+    self.assertEqual('(FULLW, 20100604)', e.value)
 
 
 class ExpirationDateTestCase(util.TestCase):
@@ -420,11 +420,11 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
         "WE,0,0,0,0,0,1,1,20070101,20101231\n")
     schedule = self.MakeLoaderAndLoad()
     e = self.accumulator.PopException("MissingValue")
-    self.assertEquals(2, e.row_num)
-    self.assertEquals("start_date", e.column_name)
+    self.assertEqual(2, e.row_num)
+    self.assertEqual("start_date", e.column_name)
     e = self.accumulator.PopException("MissingValue")
-    self.assertEquals(2, e.row_num)
-    self.assertEquals("end_date", e.column_name)
+    self.assertEqual(2, e.row_num)
+    self.assertEqual("end_date", e.column_name)
     self.accumulator.AssertNoMoreExceptions()
 
   def testNoStartDateAndBadEndDate(self):
@@ -436,10 +436,10 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
         "WE,0,0,0,0,0,1,1,20070101,20101231\n")
     schedule = self.MakeLoaderAndLoad()
     e = self.accumulator.PopException("MissingValue")
-    self.assertEquals(2, e.row_num)
-    self.assertEquals("start_date", e.column_name)
+    self.assertEqual(2, e.row_num)
+    self.assertEqual("start_date", e.column_name)
     e = self.accumulator.PopInvalidValue("end_date")
-    self.assertEquals(2, e.row_num)
+    self.assertEqual(2, e.row_num)
     self.accumulator.AssertNoMoreExceptions()
 
   def testMissingEndDateColumn(self):
@@ -451,7 +451,7 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
         "WE,0,0,0,0,0,1,1,20070101\n")
     schedule = self.MakeLoaderAndLoad()
     e = self.accumulator.PopException("MissingColumn")
-    self.assertEquals("end_date", e.column_name)
+    self.assertEqual("end_date", e.column_name)
     self.accumulator.AssertNoMoreExceptions()
 
   def testDateOutsideValidRange(self):
@@ -464,9 +464,9 @@ class CalendarTxtIntegrationTestCase(util.MemoryZipTestCase):
         "WE,0,0,0,0,0,1,1,18990101,20101231\n")
     schedule = self.MakeLoaderAndLoad()
     e = self.accumulator.PopDateOutsideValidRange('end_date', 'calendar.txt')
-    self.assertEquals('21101231', e.value)
+    self.assertEqual('21101231', e.value)
     e = self.accumulator.PopDateOutsideValidRange('start_date', 'calendar.txt')
-    self.assertEquals('18990101', e.value)
+    self.assertEqual('18990101', e.value)
     self.accumulator.AssertNoMoreExceptions()
 
 
@@ -478,7 +478,7 @@ class CalendarDatesTxtIntegrationTestCase(util.MemoryZipTestCase):
         "WE,18990815,2\n")
     schedule = self.MakeLoaderAndLoad()
     e = self.accumulator.PopDateOutsideValidRange('date', 'calendar_dates.txt')
-    self.assertEquals('18990815', e.value)
+    self.assertEqual('18990815', e.value)
     self.accumulator.AssertNoMoreExceptions()
 
 

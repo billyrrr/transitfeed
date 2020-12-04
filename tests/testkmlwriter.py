@@ -16,7 +16,7 @@
 
 """Unit tests for the kmlwriter module."""
 
-from __future__ import absolute_import
+
 import os
 import tempfile
 import unittest
@@ -178,25 +178,25 @@ class TestRouteKML(util.TestCase):
   def testCreateRoutePatternsFolderNoPatterns(self):
     folder = self.kmlwriter._CreateRoutePatternsFolder(
         self.parent, self.feed.GetRoute('route_7'))
-    self.assert_(folder is None)
+    self.assertTrue(folder is None)
 
   def testCreateRoutePatternsFolderOnePattern(self):
     folder = self.kmlwriter._CreateRoutePatternsFolder(
         self.parent, self.feed.GetRoute('route_1'))
     placemarks = folder.findall('Placemark')
-    self.assertEquals(len(placemarks), 1)
+    self.assertEqual(len(placemarks), 1)
 
   def testCreateRoutePatternsFolderTwoPatterns(self):
     folder = self.kmlwriter._CreateRoutePatternsFolder(
         self.parent, self.feed.GetRoute('route_3'))
     placemarks = folder.findall('Placemark')
-    self.assertEquals(len(placemarks), 2)
+    self.assertEqual(len(placemarks), 2)
 
   def testCreateRoutePatternFolderTwoEqualPatterns(self):
     folder = self.kmlwriter._CreateRoutePatternsFolder(
         self.parent, self.feed.GetRoute('route_4'))
     placemarks = folder.findall('Placemark')
-    self.assertEquals(len(placemarks), 1)
+    self.assertEqual(len(placemarks), 1)
 
   def testCreateRouteShapesFolderOneTripOneShape(self):
     folder = self.kmlwriter._CreateRouteShapesFolder(
@@ -216,14 +216,14 @@ class TestRouteKML(util.TestCase):
   def testCreateRouteShapesFolderTwoTripsNoShapes(self):
     folder = self.kmlwriter._CreateRouteShapesFolder(
         self.feed, self.parent, self.feed.GetRoute('route_4'))
-    self.assert_(folder is None)
+    self.assertTrue(folder is None)
 
   def assertRouteFolderContainsTrips(self, tripids, folder):
     """Assert that the route folder contains exactly tripids"""
     actual_tripds = set()
     for placemark in folder.findall('Placemark'):
       actual_tripds.add(placemark.find('name').text)
-    self.assertEquals(set(tripids), actual_tripds)
+    self.assertEqual(set(tripids), actual_tripds)
 
   def testCreateTripsFolderForRouteTwoTrips(self):
     route = self.feed.GetRoute('route_2')
@@ -274,25 +274,25 @@ class TestRouteKML(util.TestCase):
   def testCreateRouteTripsFolderNoTrips(self):
     folder = self.kmlwriter._CreateRouteTripsFolder(
         self.parent, self.feed.GetRoute('route_7'))
-    self.assert_(folder is None)
+    self.assertTrue(folder is None)
 
   def testCreateRoutesFolderNoRoutes(self):
     schedule = transitfeed.Schedule()
     folder = self.kmlwriter._CreateRoutesFolder(schedule, self.parent)
-    self.assert_(folder is None)
+    self.assertTrue(folder is None)
 
   def testCreateRoutesFolderNoRoutesWithRouteType(self):
     folder = self.kmlwriter._CreateRoutesFolder(self.feed, self.parent, 999)
-    self.assert_(folder is None)
+    self.assertTrue(folder is None)
 
   def _TestCreateRoutesFolder(self, show_trips):
     self.kmlwriter.show_trips = show_trips
     folder = self.kmlwriter._CreateRoutesFolder(self.feed, self.parent)
-    self.assertEquals(folder.tag, 'Folder')
+    self.assertEqual(folder.tag, 'Folder')
     styles = self.parent.findall('Style')
-    self.assertEquals(len(styles), len(self.feed.GetRouteList()))
+    self.assertEqual(len(styles), len(self.feed.GetRouteList()))
     route_folders = folder.findall('Folder')
-    self.assertEquals(len(route_folders), len(self.feed.GetRouteList()))
+    self.assertEqual(len(route_folders), len(self.feed.GetRouteList()))
 
   def testCreateRoutesFolder(self):
     self._TestCreateRoutesFolder(False)
@@ -303,7 +303,7 @@ class TestRouteKML(util.TestCase):
   def testCreateRoutesFolderWithRouteType(self):
     folder = self.kmlwriter._CreateRoutesFolder(self.feed, self.parent, 1)
     route_folders = folder.findall('Folder')
-    self.assertEquals(len(route_folders), 1)
+    self.assertEqual(len(route_folders), 1)
 
 
 class TestShapesKML(util.TestCase):
@@ -317,14 +317,14 @@ class TestShapesKML(util.TestCase):
 
   def testCreateShapesFolderNoShapes(self):
     folder = self.kmlwriter._CreateShapesFolder(self.good_feed, self.parent)
-    self.assertEquals(folder, None)
+    self.assertEqual(folder, None)
 
   def testCreateShapesFolder(self):
     folder = self.kmlwriter._CreateShapesFolder(self.flatten_feed, self.parent)
     placemarks = folder.findall('Placemark')
-    self.assertEquals(len(placemarks), 3)
+    self.assertEqual(len(placemarks), 3)
     for placemark in placemarks:
-      self.assert_(placemark.find('LineString') is not None)
+      self.assertTrue(placemark.find('LineString') is not None)
 
 
 class TestStopsKML(util.TestCase):
@@ -338,12 +338,12 @@ class TestStopsKML(util.TestCase):
   def testCreateStopsFolderNoStops(self):
     schedule = transitfeed.Schedule()
     folder = self.kmlwriter._CreateStopsFolder(schedule, self.parent)
-    self.assert_(folder is None)
+    self.assertTrue(folder is None)
 
   def testCreateStopsFolder(self):
     folder = self.kmlwriter._CreateStopsFolder(self.feed, self.parent)
     placemarks = folder.findall('Placemark')
-    self.assertEquals(len(placemarks), len(self.feed.GetStopList()))
+    self.assertEqual(len(placemarks), len(self.feed.GetStopList()))
 
 
 class TestShapePointsKML(util.TestCase):
@@ -358,12 +358,12 @@ class TestShapePointsKML(util.TestCase):
   def testCreateShapePointsFolder(self):
     folder = self.kmlwriter._CreateShapesFolder(self.flatten_feed, self.parent)
     shape_point_folder = folder.find('Folder')
-    self.assertEquals(shape_point_folder.find('name').text,
+    self.assertEqual(shape_point_folder.find('name').text,
                       'shape_1 Shape Points')
     placemarks = shape_point_folder.findall('Placemark')
-    self.assertEquals(len(placemarks), 4)
+    self.assertEqual(len(placemarks), 4)
     for placemark in placemarks:
-      self.assert_(placemark.find('Point') is not None)
+      self.assertTrue(placemark.find('Point') is not None)
 
 
 class FullTests(util.TempDirTestCaseBase):

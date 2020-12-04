@@ -22,7 +22,7 @@
 # Usage:
 # location_editor.py --key `cat key` --port 8765 --feed_filename feed.zip
 
-from __future__ import print_function
+
 import schedule_viewer
 import transitfeed
 

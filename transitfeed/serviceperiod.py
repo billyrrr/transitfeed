@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
+
 import datetime
 import re
 import time
@@ -55,7 +55,7 @@ class ServicePeriod(object):
       for day in self._DAYS_OF_WEEK:
         value = field_list[self._FIELD_NAMES.index(day)] or ''  # can be None
         self.original_day_values += [value.strip()]
-        self.day_of_week[self._DAYS_OF_WEEK.index(day)] = (value == u'1')
+        self.day_of_week[self._DAYS_OF_WEEK.index(day)] = (value == '1')
 
       self.start_date = field_list[self._FIELD_NAMES.index('start_date')]
       self.end_date = field_list[self._FIELD_NAMES.index('end_date')]
@@ -89,7 +89,7 @@ class ServicePeriod(object):
     start = self.start_date
     end = self.end_date
 
-    for date, (exception_type, _) in self.date_exceptions.items():
+    for date, (exception_type, _) in list(self.date_exceptions.items()):
       if exception_type == self._EXCEPTION_TYPE_REMOVE:
         continue
       if not start or (date < start):
@@ -112,8 +112,8 @@ class ServicePeriod(object):
   def GenerateCalendarDatesFieldValuesTuples(self):
     """Generates tuples of calendar_dates.txt values. Yield zero tuples if
     this ServicePeriod should not be in calendar_dates.txt ."""
-    for date, (exception_type, _) in self.date_exceptions.items():
-      yield (self.service_id, date, unicode(exception_type))
+    for date, (exception_type, _) in list(self.date_exceptions.items()):
+      yield (self.service_id, date, str(exception_type))
 
   def GetCalendarDatesFieldValuesTuples(self):
     """Return a list of date execeptions"""
@@ -293,7 +293,7 @@ class ServicePeriod(object):
         column_name = self._DAYS_OF_WEEK[index]
         if util.IsEmpty(value):
           problems.MissingValue(column_name)
-        elif (value != u'0') and (value != '1'):
+        elif (value != '0') and (value != '1'):
           problems.InvalidValue(column_name, value)
         index += 1
 
@@ -306,13 +306,13 @@ class ServicePeriod(object):
                             type=problems_module.TYPE_WARNING)
 
   def HasDateExceptionTypeAdded(self):
-    for exception_type, _ in self.date_exceptions.values():
+    for exception_type, _ in list(self.date_exceptions.values()):
       if exception_type == self._EXCEPTION_TYPE_ADD:
         return True
     return False
 
   def ValidateDates(self, problems):
-    for date, (exception_type, context) in self.date_exceptions.items():
+    for date, (exception_type, context) in list(self.date_exceptions.items()):
       self.ValidateDate(date, 'date', problems, context)
 
   def ValidateDate(self, date, field_name, problems, context=None):

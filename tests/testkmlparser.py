@@ -16,7 +16,7 @@
 
 # Unit tests for the kmlparser module.
 
-from __future__ import absolute_import
+
 import kmlparser
 import os.path
 import shutil
@@ -34,7 +34,7 @@ class TestStopsParsing(util.GetPathTestCase):
     stops = feed.GetStopList()
     self.assertEqual(1, len(stops))
     stop = stops[0]
-    self.assertEqual(u'Stop Name', stop.stop_name)
+    self.assertEqual('Stop Name', stop.stop_name)
     self.assertAlmostEqual(-93.239037, stop.stop_lon)
     self.assertAlmostEqual(44.854164, stop.stop_lat)
     write_output = StringIO()
@@ -67,7 +67,7 @@ class FullTests(util.TempDirTestCaseBase):
     accumulator = util.RecordingProblemAccumulator(self)
     problems = transitfeed.ProblemReporter(accumulator)
     schedule = transitfeed.Loader('one_stop.zip', problems=problems).Load()
-    self.assertEquals(len(schedule.GetStopList()), 1)
+    self.assertEqual(len(schedule.GetStopList()), 1)
     self.assertFalse(os.path.exists('transitfeedcrash.txt'))
 
   def testCommandLineError(self):

@@ -18,7 +18,7 @@
 
 import datetime
 import re
-import StringIO
+import io
 import tests.util as test_util
 from transitfeed import problems
 from transitfeed.problems import ProblemReporter
@@ -26,8 +26,8 @@ from transitfeed import stop
 from transitfeed import util
 from transitfeed import version
 import unittest
-from urllib2 import HTTPError, URLError
-import urllib2
+from urllib.error import HTTPError, URLError
+import urllib.request, urllib.error, urllib.parse
 
 
 class ColorLuminanceTestCase(test_util.TestCase):
@@ -55,7 +55,7 @@ class FindUniqueIdTestCase(test_util.TestCase):
     d = {}
     for i in range(0, 5):
       d[util.FindUniqueId(d)] = 1
-    k = d.keys()
+    k = list(d.keys())
     k.sort()
     self.assertEqual(('0', '1', '2', '3', '4'), tuple(k))
 
@@ -192,7 +192,7 @@ class FloatStringToFloatTestCase(test_util.TestCase):
     problems = ProblemReporter(accumulator)
 
     self.assertAlmostEqual(0, util.FloatStringToFloat("0", problems))
-    self.assertAlmostEqual(0, util.FloatStringToFloat(u"0", problems))
+    self.assertAlmostEqual(0, util.FloatStringToFloat("0", problems))
     self.assertAlmostEqual(1, util.FloatStringToFloat("1", problems))
     self.assertAlmostEqual(1, util.FloatStringToFloat("1.00000", problems))
     self.assertAlmostEqual(1.5, util.FloatStringToFloat("1.500", problems))
@@ -222,7 +222,7 @@ class NonNegIntStringToIntTestCase(test_util.TestCase):
     problems = ProblemReporter(accumulator)
 
     self.assertEqual(0, util.NonNegIntStringToInt("0", problems))
-    self.assertEqual(0, util.NonNegIntStringToInt(u"0", problems))
+    self.assertEqual(0, util.NonNegIntStringToInt("0", problems))
     self.assertEqual(1, util.NonNegIntStringToInt("1", problems))
     self.assertEqual(2, util.NonNegIntStringToInt("2", problems))
     self.assertEqual(10, util.NonNegIntStringToInt("10", problems))
@@ -254,14 +254,14 @@ class NonNegIntStringToIntTestCase(test_util.TestCase):
 
 class CheckVersionTestCase(test_util.TempDirTestCaseBase):
   def setUp(self):
-    self.orig_urlopen = urllib2.urlopen
+    self.orig_urlopen = urllib.request.urlopen
     self.mock = MockURLOpen()
     self.accumulator = test_util.RecordingProblemAccumulator(self)
     self.problems = ProblemReporter(self.accumulator)
 
   def tearDown(self):
     self.mock = None
-    urllib2.urlopen = self.orig_urlopen
+    urllib.request.urlopen = self.orig_urlopen
 
   def testAssignedDifferentVersion(self):
     util.CheckVersion(self.problems, '100.100.100')
@@ -275,33 +275,33 @@ class CheckVersionTestCase(test_util.TempDirTestCaseBase):
     self.accumulator.AssertNoMoreExceptions()
 
   def testGetCorrectReturns(self):
-    urllib2.urlopen = self.mock.mockedConnectSuccess
+    urllib.request.urlopen = self.mock.mockedConnectSuccess
     util.CheckVersion(self.problems)
     self.accumulator.PopException('NewVersionAvailable')
 
   def testPageNotFound(self):
-    urllib2.urlopen = self.mock.mockedPageNotFound
+    urllib.request.urlopen = self.mock.mockedPageNotFound
     util.CheckVersion(self.problems)
     e = self.accumulator.PopException('OtherProblem')
     self.assertTrue(re.search(r'we failed to reach', e.description))
     self.assertTrue(re.search(r'Reason: Not Found \[404\]', e.description))
 
   def testConnectionTimeOut(self):
-    urllib2.urlopen = self.mock.mockedConnectionTimeOut
+    urllib.request.urlopen = self.mock.mockedConnectionTimeOut
     util.CheckVersion(self.problems)
     e = self.accumulator.PopException('OtherProblem')
     self.assertTrue(re.search(r'we failed to reach', e.description))
     self.assertTrue(re.search(r'Reason: Connection timed', e.description))
 
   def testGetAddrInfoFailed(self):
-    urllib2.urlopen = self.mock.mockedGetAddrInfoFailed
+    urllib.request.urlopen = self.mock.mockedGetAddrInfoFailed
     util.CheckVersion(self.problems)
     e = self.accumulator.PopException('OtherProblem')
     self.assertTrue(re.search(r'we failed to reach', e.description))
     self.assertTrue(re.search(r'Reason: Getaddrinfo failed', e.description))
 
   def testEmptyIsReturned(self):
-    urllib2.urlopen = self.mock.mockedEmptyIsReturned
+    urllib.request.urlopen = self.mock.mockedEmptyIsReturned
     util.CheckVersion(self.problems)
     e = self.accumulator.PopException('OtherProblem')
     self.assertTrue(re.search(r'we had trouble parsing', e.description))
@@ -310,7 +310,7 @@ class CheckVersionTestCase(test_util.TempDirTestCaseBase):
 class MockURLOpen:
   """Pretend to be a urllib2.urlopen suitable for testing."""
   def mockedConnectSuccess(self, request):
-    return StringIO.StringIO('latest_version=100.0.1')
+    return io.StringIO('latest_version=100.0.1')
 
   def mockedPageNotFound(self, request):
     raise HTTPError(request.get_full_url(), 404, 'Not Found',
@@ -323,7 +323,7 @@ class MockURLOpen:
     raise URLError('Getaddrinfo failed')
 
   def mockedEmptyIsReturned(self, request):
-    return StringIO.StringIO()
+    return io.StringIO()
 
 
 if __name__ == '__main__':

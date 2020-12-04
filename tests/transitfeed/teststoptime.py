@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Unit tests for the stoptime module.
-from __future__ import absolute_import
+
 
 import transitfeed
 from tests import util

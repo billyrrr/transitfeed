@@ -16,7 +16,7 @@
 
 # Unit tests for the googletransit extension (extensions.googletransit)
 
-from __future__ import absolute_import
+
 import extensions.googletransit
 
 import os
@@ -127,7 +127,7 @@ class FareAttributeAgencyIdTestCase(ExtensionMemoryZipTestCase):
           ",Demo Agency,http://google.com,America/Los_Angeles,en\n")
     self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
     e = self.accumulator.PopException("InvalidAgencyID")
-    self.assertEquals('agency_id', e.column_name)
+    self.assertEqual('agency_id', e.column_name)
     self.accumulator.AssertNoMoreExceptions()
 
   def testWrongIdWithOneAgencyWithId(self):
@@ -140,7 +140,7 @@ class FareAttributeAgencyIdTestCase(ExtensionMemoryZipTestCase):
         "DTA,Demo Agency,http://google.com,America/Los_Angeles,en\n")
     self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
     e = self.accumulator.PopException("InvalidAgencyID")
-    self.assertEquals('agency_id', e.column_name)
+    self.assertEqual('agency_id', e.column_name)
     self.accumulator.AssertNoMoreExceptions()
 
   def testWrongIdWithSeveralAgencies(self):
@@ -158,7 +158,7 @@ class FareAttributeAgencyIdTestCase(ExtensionMemoryZipTestCase):
         "ATD,Another Demo Agency,http://example.com,America/Los_Angeles,en\n")
     self.MakeLoaderAndLoad(self.problems, gtfs_factory=self.gtfs_factory)
     e = self.accumulator.PopException("InvalidAgencyID")
-    self.assertEquals('agency_id', e.column_name)
+    self.assertEqual('agency_id', e.column_name)
     self.accumulator.AssertNoMoreExceptions()
 
 

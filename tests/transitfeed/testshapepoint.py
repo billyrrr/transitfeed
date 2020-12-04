@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Unit tests for the shapepoint module.
-from __future__ import absolute_import
+
 
 from tests import util
 import transitfeed

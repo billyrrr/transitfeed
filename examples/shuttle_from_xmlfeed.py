@@ -24,7 +24,7 @@ from optparse import OptionParser
 import os.path
 import re
 import transitfeed
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 try:
   import xml.etree.ElementTree as ET  # python 2.5
@@ -45,7 +45,7 @@ class NoUnusedStopExceptionProblemReporter(transitfeed.ProblemReporter):
     pass
 
 def SaveFeed(input, output):
-  tree = ET.parse(urllib.urlopen(input))
+  tree = ET.parse(urllib.request.urlopen(input))
 
   schedule = transitfeed.Schedule()
   service_period = schedule.GetDefaultServicePeriod()

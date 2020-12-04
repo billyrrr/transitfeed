@@ -17,7 +17,7 @@
 # Smoke tests feed validator. Make sure it runs and returns the right things
 # for a valid feed and a feed with errors.
 
-from __future__ import absolute_import
+
 import datetime
 import feedvalidator
 import os.path
@@ -26,8 +26,8 @@ from tests import util
 import transitfeed
 from transitfeed.compat import StringIO
 import unittest
-from urllib2 import HTTPError, URLError
-import urllib2
+from urllib.error import HTTPError, URLError
+import urllib.request, urllib.error, urllib.parse
 import zipfile
 
 
@@ -106,7 +106,7 @@ class FullTests(util.TempDirTestCaseBase):
     htmlout = open('validation-results.html').read()
     self.assertMatchesRegex(
         self.extension_message + self.extension_name, htmlout)
-    self.assertEquals(2, len(re.findall(r'class="problem">stop_id<', htmlout)))
+    self.assertEqual(2, len(re.findall(r'class="problem">stop_id<', htmlout)))
     self.assertFalse(os.path.exists('transitfeedcrash.txt'))
 
   def testBadDateFormat(self):
@@ -223,8 +223,8 @@ class CalendarSummaryTestCase(util.TestCase):
 
       result = feedvalidator.CalendarSummary(schedule)
 
-      self.assertEquals(0, result['max_trips'])
-      self.assertEquals(0, result['min_trips'])
+      self.assertEqual(0, result['max_trips'])
+      self.assertEqual(0, result['min_trips'])
       self.assertTrue(re.search("40 service dates", result['max_trips_dates']))
 
   # Test feeds ending in less than 60 days
@@ -241,8 +241,8 @@ class CalendarSummaryTestCase(util.TestCase):
 
       result = feedvalidator.CalendarSummary(schedule)
 
-      self.assertEquals(0, result['max_trips'])
-      self.assertEquals(0, result['min_trips'])
+      self.assertEqual(0, result['max_trips'])
+      self.assertEqual(0, result['min_trips'])
       self.assertTrue(re.search("15 service dates", result['max_trips_dates']))
 
   # Test feeds starting in the future *and* ending in less than 60 days
@@ -260,8 +260,8 @@ class CalendarSummaryTestCase(util.TestCase):
 
       result = feedvalidator.CalendarSummary(schedule)
 
-      self.assertEquals(0, result['max_trips'])
-      self.assertEquals(0, result['min_trips'])
+      self.assertEqual(0, result['max_trips'])
+      self.assertEqual(0, result['min_trips'])
       self.assertTrue(re.search("1 service date", result['max_trips_dates']))
 
   # Test feeds without service days
@@ -269,7 +269,7 @@ class CalendarSummaryTestCase(util.TestCase):
       schedule = transitfeed.Schedule()
       result = feedvalidator.CalendarSummary(schedule)
 
-      self.assertEquals({}, result)
+      self.assertEqual({}, result)
 
 
 class MockOptions:
@@ -296,7 +296,7 @@ class FeedValidatorTestCase(util.TempDirTestCaseBase):
     content_dict = self.ConvertZipToDict(old_zip)
     old_routes = content_dict[filename]
     new_routes = old_routes.replace('\n', '\r\n', 1)
-    self.assertNotEquals(old_routes, new_routes)
+    self.assertNotEqual(old_routes, new_routes)
     content_dict[filename] = new_routes
     new_zipfile_mem = self.ConvertDictToZip(content_dict)
 
@@ -321,7 +321,7 @@ class LimitPerTypeProblemReporterTestCase(util.TestCase):
     for e in self.problems.GetAccumulator().ProblemList(
         problem_type, class_name).problems:
       problem_attribute_list.append(getattr(e, attribute_name))
-    self.assertEquals(expected, " ".join(problem_attribute_list))
+    self.assertEqual(expected, " ".join(problem_attribute_list))
 
   def testLimitOtherProblems(self):
     """The first N of each type should be kept."""
@@ -333,8 +333,8 @@ class LimitPerTypeProblemReporterTestCase(util.TestCase):
     self.problems.OtherProblem("e2", type=transitfeed.TYPE_ERROR)
     self.problems.OtherProblem("e3", type=transitfeed.TYPE_ERROR)
     self.problems.OtherProblem("w2", type=transitfeed.TYPE_WARNING)
-    self.assertEquals(2, self.accumulator.WarningCount())
-    self.assertEquals(3, self.accumulator.ErrorCount())
+    self.assertEqual(2, self.accumulator.WarningCount())
+    self.assertEqual(3, self.accumulator.ErrorCount())
 
     # These are BoundedProblemList objects
     warning_bounded_list = self.accumulator.ProblemList(
@@ -342,11 +342,11 @@ class LimitPerTypeProblemReporterTestCase(util.TestCase):
     error_bounded_list = self.accumulator.ProblemList(
         transitfeed.TYPE_ERROR, "OtherProblem")
 
-    self.assertEquals(2, warning_bounded_list.count)
-    self.assertEquals(3, error_bounded_list.count)
+    self.assertEqual(2, warning_bounded_list.count)
+    self.assertEqual(3, error_bounded_list.count)
 
-    self.assertEquals(0, warning_bounded_list.dropped_count)
-    self.assertEquals(1, error_bounded_list.dropped_count)
+    self.assertEqual(0, warning_bounded_list.dropped_count)
+    self.assertEqual(1, error_bounded_list.dropped_count)
 
     self.assertProblemsAttribute(transitfeed.TYPE_ERROR,  "OtherProblem",
         "description", "e1 e2")
@@ -370,13 +370,13 @@ class LimitPerTypeProblemReporterTestCase(util.TestCase):
     for e in exceptions:
       self.problems.AddToAccumulator(e)
 
-    self.assertEquals(0, self.accumulator.WarningCount())
-    self.assertEquals(20, self.accumulator.ErrorCount())
+    self.assertEqual(0, self.accumulator.WarningCount())
+    self.assertEqual(20, self.accumulator.ErrorCount())
 
     bounded_list = self.accumulator.ProblemList(
         transitfeed.TYPE_ERROR, "OtherProblem")
-    self.assertEquals(20, bounded_list.count)
-    self.assertEquals(17, bounded_list.dropped_count)
+    self.assertEqual(20, bounded_list.count)
+    self.assertEqual(17, bounded_list.dropped_count)
     self.assertProblemsAttribute(transitfeed.TYPE_ERROR,  "OtherProblem",
         "description", "e10 e11 e12")
 
@@ -389,8 +389,8 @@ class LimitPerTypeProblemReporterTestCase(util.TestCase):
     self.problems.TooFastTravel("t2", "prev stop", "next stop", 1120.4, 5, None)
     self.problems.TooFastTravel("t3", "prev stop", "next stop", 1130.4, 5, None)
     self.problems.TooFastTravel("t4", "prev stop", "next stop", 1230.4, 5, None)
-    self.assertEquals(0, self.accumulator.WarningCount())
-    self.assertEquals(4, self.accumulator.ErrorCount())
+    self.assertEqual(0, self.accumulator.WarningCount())
+    self.assertEqual(4, self.accumulator.ErrorCount())
     self.assertProblemsAttribute(transitfeed.TYPE_ERROR, "TooFastTravel",
         "trip_id", "t1 t4 t3")
 
@@ -401,8 +401,8 @@ class LimitPerTypeProblemReporterTestCase(util.TestCase):
     for i, distance in enumerate((1000, 3002.0, 1500, 2434.1, 5023.21)):
       self.problems.StopTooFarFromParentStation(
           "s%d" % i, "S %d" % i, "p%d" % i, "P %d" % i, distance)
-    self.assertEquals(5, self.accumulator.WarningCount())
-    self.assertEquals(0, self.accumulator.ErrorCount())
+    self.assertEqual(5, self.accumulator.WarningCount())
+    self.assertEqual(0, self.accumulator.ErrorCount())
     self.assertProblemsAttribute(transitfeed.TYPE_WARNING,
         "StopTooFarFromParentStation", "stop_id", "s4 s1 s3")
 
@@ -413,8 +413,8 @@ class LimitPerTypeProblemReporterTestCase(util.TestCase):
     for i, distance in enumerate((4.0, 3.0, 2.5, 2.2, 1.0, 0.0)):
       self.problems.StopsTooClose(
           "Sa %d" % i, "sa%d" % i, "Sb %d" % i, "sb%d" % i, distance)
-    self.assertEquals(6, self.accumulator.WarningCount())
-    self.assertEquals(0, self.accumulator.ErrorCount())
+    self.assertEqual(6, self.accumulator.WarningCount())
+    self.assertEqual(0, self.accumulator.ErrorCount())
     self.assertProblemsAttribute(transitfeed.TYPE_WARNING,
         "StopsTooClose", "stop_id_a", "sa5 sa4 sa3")
 

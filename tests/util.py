@@ -15,8 +15,8 @@
 # limitations under the License.
 
 # Code shared between tests.
-from __future__ import absolute_import
-from __future__ import print_function
+
+
 
 import os
 import os.path
@@ -199,7 +199,7 @@ class TempDirTestCaseBase(GetPathTestCase):
         The new file's in-memory contents as a file-like object."""
     zipfile_mem = StringIO()
     zip = zipfile.ZipFile(zipfile_mem, 'a')
-    for arcname, contents in dict.items():
+    for arcname, contents in list(dict.items()):
       zip.writestr(arcname, contents)
     zip.close()
     return zipfile_mem
@@ -315,13 +315,13 @@ class MemoryZipTestCase(TestCase):
 
   def GetArchiveNames(self):
     """Get a list of all the archive names in the file dict."""
-    return self.zip_contents.keys()
+    return list(self.zip_contents.keys())
 
   def CreateZip(self):
     """Create an in-memory GTFS zipfile from the contents of the file dict."""
     self.zipfile = StringIO()
     self.zip = zipfile.ZipFile(self.zipfile, 'a')
-    for (arcname, contents) in self.zip_contents.items():
+    for (arcname, contents) in list(self.zip_contents.items()):
       self.zip.writestr(arcname, contents)
 
   def DumpZipFile(self, zf):
@@ -545,9 +545,9 @@ class RecordingProblemAccumulator(transitfeed.ProblemAccumulatorInterface):
         the exception object
     """
     e = self.PopException(type_name)
-    self._test_case.assertEquals(column_name, e.column_name)
+    self._test_case.assertEqual(column_name, e.column_name)
     if file_name:
-      self._test_case.assertEquals(file_name, e.file_name)
+      self._test_case.assertEqual(file_name, e.file_name)
     return e
 
   def PopInvalidValue(self, column_name, file_name=None):
@@ -564,9 +564,9 @@ class RecordingProblemAccumulator(transitfeed.ProblemAccumulatorInterface):
 
   def PopDuplicateColumn(self, file_name, header, count):
     e = self.PopException("DuplicateColumn")
-    self._test_case.assertEquals(file_name, e.file_name)
-    self._test_case.assertEquals(header, e.header)
-    self._test_case.assertEquals(count, e.count)
+    self._test_case.assertEqual(file_name, e.file_name)
+    self._test_case.assertEqual(header, e.header)
+    self._test_case.assertEqual(count, e.count)
     return e
 
   def _SortExceptionGroups(self):

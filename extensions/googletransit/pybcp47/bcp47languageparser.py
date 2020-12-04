@@ -136,7 +136,7 @@ class Bcp47LanguageParser(object):
                                     line_number)
 
   def IntStr26ToInt(self, int_str):
-    return reduce(lambda x, y: 26 * x + y, map(string.lowercase.index, int_str))
+    return reduce(lambda x, y: 26 * x + y, list(map(string.lowercase.index, int_str)))
 
   def IntToIntStr26(self, int_value, int_str=''):
     if int_value == 0:

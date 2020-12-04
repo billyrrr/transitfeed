@@ -22,7 +22,7 @@ to use noon as a fixed point will work.
 This script depends on internals of pytz. I considered hacking up something
 based on zic.c or zdump.c in tzcode2009k.tar.gz but this seemed much easier.
 """
-from __future__ import print_function
+
 
 import pytz
 import datetime

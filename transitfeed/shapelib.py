@@ -28,7 +28,7 @@ are relatively close together on the surface of the earth, this
 is adequate; for other purposes, this library may not be accurate
 enough.
 """
-from __future__ import print_function
+
 
 __author__ = 'chris.harrelson.code@gmail.com (Chris Harrelson)'
 
@@ -416,7 +416,7 @@ class PolyCollection(object):
     within max_radius of the given start and end points.
     """
     matches = []
-    for shape in self._name_to_shape.itervalues():
+    for shape in self._name_to_shape.values():
       if start_point.GetDistanceMeters(shape.GetPoint(0)) < max_radius and \
         end_point.GetDistanceMeters(shape.GetPoint(-1)) < max_radius:
         matches.append(shape)
@@ -540,7 +540,7 @@ class PolyGraph(PolyCollection):
     paths_found = [] # A heap sorted by inverse path length.
 
     for i, point in enumerate(points):
-      nearby = [p for p in self._nodes.iterkeys()
+      nearby = [p for p in self._nodes.keys()
                 if p.GetDistanceMeters(point) < max_radius]
       if verbosity >= 2:
         print ("Nearby points for point %d %s: %s"

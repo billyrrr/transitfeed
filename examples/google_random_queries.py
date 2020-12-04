@@ -23,7 +23,7 @@ polyline looks okay (no unnecassary loops, no jumps to a far away location) and
 look at the time of each leg. Also check the route names and headsigns are
 formatted correctly and not redundant.
 """
-from __future__ import print_function
+
 
 from datetime import datetime
 from datetime import timedelta
@@ -33,8 +33,8 @@ import os.path
 import random
 import sys
 import transitfeed
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 
 
 def Distance(lat0, lng0, lat1, lng1):
@@ -105,8 +105,8 @@ def LatLngsToGoogleUrl(source, destination, dt):
             "dirflg": "r",
             "ie": "UTF8",
             "oe": "UTF8"}
-  url = urlparse.urlunsplit(("http", "maps.google.com", "/maps",
-                             urllib.urlencode(params), ""))
+  url = urllib.parse.urlunsplit(("http", "maps.google.com", "/maps",
+                             urllib.parse.urlencode(params), ""))
   return url
 
 

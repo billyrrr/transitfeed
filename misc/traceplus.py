@@ -19,7 +19,7 @@ Wrapper that makes more useful stack dumps when your script crashes.
 
 See traceplus_example.py for a demonstration.
 """
-from __future__ import print_function
+
 
 def MakeExpandedTrace(frame_records):
   """Return a list of text lines for the given list of frame records."""
@@ -34,7 +34,7 @@ def MakeExpandedTrace(frame_records):
           dump.append(' --> %s' % line)
         else:
           dump.append('     %s' % line)
-    for local_name, local_val in frame_obj.f_locals.items():
+    for local_name, local_val in list(frame_obj.f_locals.items()):
       try:
         local_type_name = type(local_val).__name__
       except Exception as e:

@@ -68,7 +68,7 @@ in a folder hierarchy which looks like this at the top level:
     - Routes - Rail
     - Shapes
 """
-from __future__ import print_function
+
 
 try:
   import xml.etree.ElementTree as ET  # python 2.5
@@ -401,7 +401,7 @@ class KMLWriter(object):
     """
 
     def CreateElements(current_element, current_dict):
-      for (key, value) in current_dict.iteritems():
+      for (key, value) in current_dict.items():
         element = ET.SubElement(current_element, key)
         if isinstance(value,dict):
           CreateElements(element, value)
@@ -458,7 +458,7 @@ class KMLWriter(object):
       return None
 
     # sort by number of trips using the pattern
-    pattern_trips = pattern_id_to_trips.values()
+    pattern_trips = list(pattern_id_to_trips.values())
     pattern_trips.sort(lambda a, b: cmp(len(b), len(a)))
 
     folder = self._CreateFolder(parent, 'Patterns', visible)
@@ -500,7 +500,7 @@ class KMLWriter(object):
       return None
 
     # sort by the number of trips using the shape
-    shape_id_to_trips_items = shape_id_to_trips.items()
+    shape_id_to_trips_items = list(shape_id_to_trips.items())
     shape_id_to_trips_items.sort(lambda a, b: cmp(len(b[1]), len(a[1])))
 
     folder = self._CreateFolder(parent, 'Shapes', visible)

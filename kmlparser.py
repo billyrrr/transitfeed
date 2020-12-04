@@ -27,7 +27,7 @@ a single point.
 For line geometries, information about shapes is extracted from a kml file.
 
 """
-from __future__ import print_function
+
 
 import re
 import string

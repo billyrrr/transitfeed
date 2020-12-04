@@ -16,7 +16,7 @@
 
 
 """Filter the unused stops out of a transit feed file."""
-from __future__ import print_function
+
 
 import optparse
 import sys
@@ -44,7 +44,7 @@ def main():
 
   print("Removing unused stops...")
   removed = 0
-  for stop_id, stop in schedule.stops.items():
+  for stop_id, stop in list(schedule.stops.items()):
     if not stop.GetTrips(schedule):
       removed += 1
       del schedule.stops[stop_id]

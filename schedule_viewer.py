@@ -19,10 +19,10 @@ An example application that uses the transitfeed module.
 
 You must provide a Google Maps API key.
 """
-from __future__ import print_function
 
 
-import BaseHTTPServer, sys, urlparse
+
+import http.server, sys, urllib.parse
 import bisect
 from gtfsscheduleviewer.marey_graph import MareyGraph
 import gtfsscheduleviewer
@@ -35,7 +35,7 @@ import socket
 import time
 import transitfeed
 from transitfeed import util
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 
 # By default Windows kills Python with Ctrl+Break. Instead make Ctrl+Break
@@ -63,9 +63,9 @@ class ResultEncoder(simplejson.JSONEncoder):
 # http://mail.python.org/pipermail/python-list/2003-July/212751.html
 # but it requires multiple threads. A sqlite object can only be used from one
 # thread.
-class StoppableHTTPServer(BaseHTTPServer.HTTPServer):
+class StoppableHTTPServer(http.server.HTTPServer):
   def server_bind(self):
-    BaseHTTPServer.HTTPServer.server_bind(self)
+    http.server.HTTPServer.server_bind(self)
     self.socket.settimeout(1)
     self._run = True
 
@@ -92,15 +92,15 @@ def StopToTuple(stop):
           float(stop.stop_lon), stop.location_type)
 
 
-class ScheduleRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class ScheduleRequestHandler(http.server.BaseHTTPRequestHandler):
   def do_GET(self):
-    scheme, host, path, x, params, fragment = urlparse.urlparse(self.path)
+    scheme, host, path, x, params, fragment = urllib.parse.urlparse(self.path)
     parsed_params = {}
     for k in params.split('&'):
-      k = urllib.unquote(k)
+      k = urllib.parse.unquote(k)
       if '=' in k:
         k, v = k.split('=', 1)
-        parsed_params[k] = unicode(v, 'utf8')
+        parsed_params[k] = str(v, 'utf8')
       else:
         parsed_params[k] = ''
 
@@ -199,7 +199,7 @@ class ScheduleRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     pattern_id_trip_dict = route.GetPatternIdTripDict()
     patterns = []
 
-    for pattern_id, trips in pattern_id_trip_dict.items():
+    for pattern_id, trips in list(pattern_id_trip_dict.items()):
       time_stops = trips[0].GetTimeStops()
       if not time_stops:
         continue
@@ -221,7 +221,7 @@ class ScheduleRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
       # We're only interested in the trips that do run on the specified date
       trips = trips_with_service
 
-      name = u'%s to %s, %d stops' % (time_stops[0][2].stop_name, time_stops[-1][2].stop_name, len(time_stops))
+      name = '%s to %s, %d stops' % (time_stops[0][2].stop_name, time_stops[-1][2].stop_name, len(time_stops))
       transitfeed.SortListOfTripByTime(trips)
 
       num_trips = len(trips)
@@ -291,8 +291,8 @@ class ScheduleRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
       # if a non-existent trip is searched for, the return nothing
       return
     route = schedule.GetRoute(trip.route_id)
-    trip_row = dict(trip.iteritems())
-    route_row = dict(route.iteritems())
+    trip_row = dict(iter(trip.items()))
+    route_row = dict(iter(route.items()))
     return [['trips.txt', trip_row], ['routes.txt', route_row]]
 
   def handle_json_GET_tripstoptimes(self, params):
@@ -426,7 +426,7 @@ class ScheduleRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     pattern_id_trip_dict = route.GetPatternIdTripDict()
     pattern_id = trip.pattern_id
     if pattern_id not in pattern_id_trip_dict:
-      print('no pattern %s found in %s' % (pattern_id, pattern_id_trip_dict.keys()))
+      print('no pattern %s found in %s' % (pattern_id, list(pattern_id_trip_dict.keys())))
       self.send_error(404)
       return
     triplist = pattern_id_trip_dict[pattern_id]
@@ -523,7 +523,7 @@ https://github.com/google/transitfeed/wiki/ScheduleViewer
     options.feed_filename = args[0]
 
   if not options.feed_filename and options.manual_entry:
-    options.feed_filename = raw_input('Enter Feed Location: ').strip('"')
+    options.feed_filename = input('Enter Feed Location: ').strip('"')
 
   default_key_file = GetDefaultKeyFilePath()
   if not options.key and os.path.isfile(default_key_file):

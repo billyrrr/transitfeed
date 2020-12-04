@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Unit tests for the agency module.
-from __future__ import absolute_import
+
 
 import transitfeed
 from tests import util
@@ -97,7 +97,7 @@ class AgencyValidationTestCase(util.ValidationTestCase):
     # Multiple problems
     agency = transitfeed.Agency(name='Test Agency', url='www.example.com',
                                 timezone='America/West Coast', id='TA')
-    self.assertEquals(False, agency.Validate(self.problems))
+    self.assertEqual(False, agency.Validate(self.problems))
     e = self.accumulator.PopException('InvalidValue')
     self.assertEqual(e.column_name, 'agency_url')
     e = self.accumulator.PopException('InvalidValue')
@@ -112,10 +112,10 @@ class AgencyAttributesTestCase(util.ValidationTestCase):
                                             'agency_url': 'http://example.com',
                                             'timezone': 'America/Los_Angeles',
                                             'agency_mission': 'get you there'})
-    self.assertEquals(agency.agency_mission, 'get you there')
+    self.assertEqual(agency.agency_mission, 'get you there')
     agency_copy = transitfeed.Agency(field_dict=agency)
-    self.assertEquals(agency_copy.agency_mission, 'get you there')
-    self.assertEquals(agency_copy['agency_mission'], 'get you there')
+    self.assertEqual(agency_copy.agency_mission, 'get you there')
+    self.assertEqual(agency_copy['agency_mission'], 'get you there')
 
   def testEq(self):
     agency1 = transitfeed.Agency("Test Agency", "http://example.com",
@@ -123,18 +123,18 @@ class AgencyAttributesTestCase(util.ValidationTestCase):
     agency2 = transitfeed.Agency("Test Agency", "http://example.com",
                                  "America/Los_Angeles")
     # Unknown columns, such as agency_mission, do affect equality
-    self.assertEquals(agency1, agency2)
+    self.assertEqual(agency1, agency2)
     agency1.agency_mission = "Get you there"
-    self.assertNotEquals(agency1, agency2)
+    self.assertNotEqual(agency1, agency2)
     agency2.agency_mission = "Move you"
-    self.assertNotEquals(agency1, agency2)
+    self.assertNotEqual(agency1, agency2)
     agency1.agency_mission = "Move you"
-    self.assertEquals(agency1, agency2)
+    self.assertEqual(agency1, agency2)
     # Private attributes don't affect equality
     agency1._private_attr = "My private message"
-    self.assertEquals(agency1, agency2)
+    self.assertEqual(agency1, agency2)
     agency2._private_attr = "Another private thing"
-    self.assertEquals(agency1, agency2)
+    self.assertEqual(agency1, agency2)
 
   def testDict(self):
     agency = transitfeed.Agency("Test Agency", "http://example.com",
@@ -142,15 +142,15 @@ class AgencyAttributesTestCase(util.ValidationTestCase):
     agency._private_attribute = "blah"
     # Private attributes don't appear when iterating through an agency as a
     # dict but can be directly accessed.
-    self.assertEquals("blah", agency._private_attribute)
-    self.assertEquals("blah", agency["_private_attribute"])
-    self.assertEquals(
+    self.assertEqual("blah", agency._private_attribute)
+    self.assertEqual("blah", agency["_private_attribute"])
+    self.assertEqual(
         set("agency_name agency_url agency_timezone".split()),
         set(agency.keys()))
-    self.assertEquals({"agency_name": "Test Agency",
+    self.assertEqual({"agency_name": "Test Agency",
                        "agency_url": "http://example.com",
                        "agency_timezone": "America/Los_Angeles"},
-                      dict(agency.iteritems()))
+                      dict(iter(agency.items())))
 
 
 class DeprecatedAgencyFieldsTestCase(util.MemoryZipTestCase):
@@ -163,7 +163,7 @@ class DeprecatedAgencyFieldsTestCase(util.MemoryZipTestCase):
         "http://google.com/tickets\n")
     self.MakeLoaderAndLoad(self.problems)
     e = self.accumulator.PopException("DeprecatedColumn")
-    self.assertEquals("agency_ticket_url", e.column_name)
+    self.assertEqual("agency_ticket_url", e.column_name)
     self.accumulator.AssertNoMoreExceptions()
 
 

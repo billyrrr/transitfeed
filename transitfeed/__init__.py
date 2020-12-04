@@ -56,7 +56,7 @@ Stop object which has attributes such as stop_lat and stop_name.
   TimeToSecondsSinceMidnight(): Convert HH:MM:SS into seconds since midnight.
   FormatSecondsSinceMidnight(s): Formats number of seconds past midnight into a string
 """
-from __future__ import absolute_import
+
 
 # util needs to be imported before problems because otherwise the loading order
 # of this module is Agency -> Problems -> Util -> Trip and trip tries to

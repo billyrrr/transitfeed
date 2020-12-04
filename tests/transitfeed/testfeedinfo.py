@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Unit tests for the feedinfo module.
-from __future__ import absolute_import
+
 
 from datetime import date
 from tests import util
@@ -86,11 +86,11 @@ class FeedInfoTestCase(util.MemoryZipTestCase):
         "DTA,http://google.com,America/Los_Angeles,en,20101201,20101231")
     self.MakeLoaderAndLoad(self.problems)
     e = self.accumulator.PopException("DeprecatedColumn")
-    self.assertEquals("feed_valid_from", e.column_name)
+    self.assertEqual("feed_valid_from", e.column_name)
     e = self.accumulator.PopException("DeprecatedColumn")
-    self.assertEquals("feed_valid_until", e.column_name)
+    self.assertEqual("feed_valid_until", e.column_name)
     e = self.accumulator.PopException("DeprecatedColumn")
-    self.assertEquals("feed_timezone", e.column_name)
+    self.assertEqual("feed_timezone", e.column_name)
     self.accumulator.AssertNoMoreExceptions()
 
 
@@ -125,8 +125,8 @@ class FeedInfoServiceGapsTestCase(util.MemoryZipTestCase):
     self.schedule.Validate(today=date(2009, 6, 5),
                            service_gap_interval=7)
     exception = self.accumulator.PopException("TooManyDaysWithoutService")
-    self.assertEquals(date(2009, 6, 11),
+    self.assertEqual(date(2009, 6, 11),
                       exception.first_day_without_service)
-    self.assertEquals(date(2009, 6, 19),
+    self.assertEqual(date(2009, 6, 19),
                       exception.last_day_without_service)
     self.accumulator.AssertNoMoreExceptions()

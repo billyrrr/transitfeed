@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Unit tests for the gtfsfactory module.
-from __future__ import absolute_import
+
 
 from tests import util
 import transitfeed
@@ -124,7 +124,7 @@ class TestGtfsFactory(util.TestCase):
         "transfers.txt", "routes.txt", "trips.txt"):
       class_object = self._factory.GetGtfsClassByFileName(filename)
       self.assertTrue(isinstance(class_object,
-                                 (types.TypeType, types.ClassType)),
+                                 type),
                       "The mapping from filenames to classes must return "
                       "classes and not instances. This is not the case for " +
                       filename)
@@ -190,7 +190,7 @@ class TestGtfsFactoryUser(util.TestCase):
 
   def AssertFactoryIsSavedAndReturned(self, instance, factory):
     instance.SetGtfsFactory(factory)
-    self.assertEquals(factory, instance.GetGtfsFactory())
+    self.assertEqual(factory, instance.GetGtfsFactory())
 
   def testClasses(self):
     class FakeGtfsFactory(object):

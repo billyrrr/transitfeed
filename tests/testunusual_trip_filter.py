@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Tests for unusual_trip_filter.py"""
-from __future__ import absolute_import
+
 
 __author__ = 'Jiri Semecky <jiri.semecky@gmail.com>'
 
@@ -38,12 +38,12 @@ class UnusualTripFilterTestCase(util.TempDirTestCaseBase):
     loader = transitfeed.Loader(input, extra_validation=True)
     schedule = loader.Load()
     filter.filter(schedule)
-    for trip_id, expected_trip_type in expected_values.items():
+    for trip_id, expected_trip_type in list(expected_values.items()):
       actual_trip_type = schedule.trips[trip_id]['trip_type']
       try:
-        self.assertEquals(int(actual_trip_type), expected_trip_type)
+        self.assertEqual(int(actual_trip_type), expected_trip_type)
       except ValueError:
-        self.assertEquals(actual_trip_type, '')
+        self.assertEqual(actual_trip_type, '')
 
   def testFilterNoForceFilter(self):
     """Test that force==False doesn't set default values"""
@@ -54,9 +54,9 @@ class UnusualTripFilterTestCase(util.TempDirTestCaseBase):
     schedule.trips['CITY2'].trip_type = 'odd-trip'
     filter.filter(schedule)
     trip1 = schedule.trips['CITY1']
-    self.assertEquals(trip1['trip_type'], '')
+    self.assertEqual(trip1['trip_type'], '')
     trip2 = schedule.trips['CITY2']
-    self.assertEquals(trip2['trip_type'], 'odd-trip')
+    self.assertEqual(trip2['trip_type'], 'odd-trip')
 
   def testFilterForceFilter(self):
     """Test that force==True does set default values"""
@@ -67,9 +67,9 @@ class UnusualTripFilterTestCase(util.TempDirTestCaseBase):
     schedule.trips['CITY2'].trip_type = 'odd-trip'
     filter.filter(schedule)
     trip1 = schedule.trips['CITY1']
-    self.assertEquals(trip1['trip_type'], '0')
+    self.assertEqual(trip1['trip_type'], '0')
     trip2 = schedule.trips['CITY2']
-    self.assertEquals(trip2['trip_type'], '0')
+    self.assertEqual(trip2['trip_type'], '0')
 
   def testFilterAppliedForSpecifiedRouteType(self):
     """Setting integer route_type filters trips of this route type."""
@@ -80,7 +80,7 @@ class UnusualTripFilterTestCase(util.TempDirTestCaseBase):
     schedule = loader.Load()
     filter.filter(schedule)
     actual_trip_type = schedule.trips['CITY11']['trip_type']
-    self.assertEquals(actual_trip_type, '1')
+    self.assertEqual(actual_trip_type, '1')
 
   def testFilterNotAppliedForUnspecifiedRouteType(self):
     """Setting integer route_type filters trips of this route type."""
@@ -91,7 +91,7 @@ class UnusualTripFilterTestCase(util.TempDirTestCaseBase):
     schedule = loader.Load()
     filter.filter(schedule)
     actual_trip_type = schedule.trips['CITY11']['trip_type']
-    self.assertEquals(actual_trip_type, '')
+    self.assertEqual(actual_trip_type, '')
 
   def testFilterAppliedForRouteTypeSpecifiedByName(self):
     """Setting integer route_type filters trips of this route type."""
@@ -102,7 +102,7 @@ class UnusualTripFilterTestCase(util.TempDirTestCaseBase):
     schedule = loader.Load()
     filter.filter(schedule)
     actual_trip_type = schedule.trips['CITY11']['trip_type']
-    self.assertEquals(actual_trip_type, '1')
+    self.assertEqual(actual_trip_type, '1')
 
   def testFilterNotAppliedForDifferentRouteTypeSpecifiedByName(self):
     """Setting integer route_type filters trips of this route type."""
@@ -113,7 +113,7 @@ class UnusualTripFilterTestCase(util.TempDirTestCaseBase):
     schedule = loader.Load()
     filter.filter(schedule)
     actual_trip_type = schedule.trips['CITY11']['trip_type']
-    self.assertEquals(actual_trip_type, '')
+    self.assertEqual(actual_trip_type, '')
 
 if __name__ == '__main__':
   unittest.main()

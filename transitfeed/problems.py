@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-from __future__ import absolute_import
+
+
 from functools import reduce
 import logging
 import time
@@ -445,7 +445,7 @@ class ExceptionWithContext(Exception):
   def GetDictToFormat(self):
     """Return a copy of self as a dict, suitable for passing to FormatProblem"""
     d = {}
-    for k, v in self.__dict__.items():
+    for k, v in list(self.__dict__.items()):
       # TODO: Better handling of unicode/utf-8 within Schedule objects.
       # Concatinating a unicode and utf-8 str object causes an exception such
       # as "UnicodeDecodeError: 'ascii' codec can't decode byte ..." as python

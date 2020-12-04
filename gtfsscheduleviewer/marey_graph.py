@@ -32,7 +32,7 @@ http://transliteracies.english.ucsb.edu/post/research-project/research-clearingh
                and draws marey graphs in svg/xml format on request.
 
 """
-from __future__ import print_function
+
 
 import itertools
 import transitfeed
@@ -229,7 +229,7 @@ class MareyGraph:
       [0,33,140, ... ,X]
     """
     e_dists2 = [transitfeed.ApproximateDistanceBetweenStops(stop, tail) for
-                (stop,tail) in itertools.izip(slist, slist[1:])]
+                (stop,tail) in zip(slist, slist[1:])]
 
     return e_dists2
 
@@ -289,7 +289,7 @@ class MareyGraph:
       trip = triplist[0]
 
     t_dists2 = [DistanceInTravelTime(stop[3],tail[2]) for (stop,tail)
-                 in itertools.izip(trip.GetTimeStops(),trip.GetTimeStops()[1:])]
+                 in zip(trip.GetTimeStops(),trip.GetTimeStops()[1:])]
     return t_dists2
 
   def _AddWarning(self, str):

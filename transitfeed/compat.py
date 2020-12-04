@@ -14,6 +14,6 @@
 # limitations under the License.
 
 try:  # py2
-  from StringIO import StringIO
+  from io import StringIO
 except ImportError:
   from io import StringIO

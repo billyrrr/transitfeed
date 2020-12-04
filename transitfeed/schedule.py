@@ -261,7 +261,7 @@ class Schedule(object):
     self.service_periods[service_period.service_id] = service_period
 
   def GetServicePeriodList(self):
-    return self.service_periods.values()
+    return [v for _, v in self.service_periods.items()]
 
   def GetDateRange(self):
     """Returns a tuple of (earliest, latest) dates on which the service periods
@@ -287,8 +287,8 @@ class Schedule(object):
     if not starts or not ends:
       return (None, None, None, None)
 
-    minvalue, minindex = min(itertools.izip(starts, itertools.count()))
-    maxvalue, maxindex = max(itertools.izip(ends, itertools.count()))
+    minvalue, minindex = min(zip(starts, itertools.count()))
+    maxvalue, maxindex = max(zip(ends, itertools.count()))
 
     minreason = (period_list[minindex].HasDateExceptionOn(minvalue) and
                  "earliest service exception date in calendar_dates.txt" or
@@ -574,7 +574,7 @@ class Schedule(object):
     return list(self.GetTransferIter())
 
   def GetStop(self, id):
-    return self.stops[id]
+    return self.stops[int(id)]
 
   def GetFareZones(self):
     """Returns the list of all fare zones that have been identified by
@@ -1029,8 +1029,7 @@ class Schedule(object):
     # each pair of stations within 2 meters latitude of each other. This avoids
     # doing n^2 comparisons in the average case and doesn't need a spatial
     # index.
-    sorted_stops = filter(lambda s: s.stop_lat and s.stop_lon,
-                          self.GetStopList())
+    sorted_stops = [s for s in self.GetStopList() if s.stop_lat and s.stop_lon]
     sorted_stops.sort(
         key=(lambda x: [x.stop_lat, x.stop_lon, getattr(x, 'stop_id', None)]))
     TWO_METERS_LAT = 0.000018
@@ -1103,8 +1102,7 @@ class Schedule(object):
     # a dict mapping block_id to a list of tuple of
     # (trip_id, first_arrival_secs, last_arrival_secs)
     trip_intervals_by_block_id = defaultdict(lambda: [])
-
-    for trip in sorted(self.trips.values()):
+    for _, trip in self.trips.items():
       if trip.route_id not in self.routes:
         continue
       route_type = self.GetRoute(trip.route_id).route_type

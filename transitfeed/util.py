@@ -239,10 +239,10 @@ def EncodeUnicode(text):
   """
   Optionally encode text and return it. The result should be safe to print.
   """
-  if type(text) == type(u''):
-    return text.encode(OUTPUT_ENCODING)
-  else:
-    return text
+  # if type(text) == type(u''):
+  #   return text.encode(OUTPUT_ENCODING)
+  # else:
+  return text
 
 def IsValidURL(url):
   """
@@ -444,7 +444,7 @@ def ValidateYesNoUnknown(value, column_name=None, problems=None):
     return False
 
 def IsEmpty(value):
-  return value is None or (isinstance(value, basestring) and not value.strip())
+  return value is None or (isinstance(value, str) and not value.strip())
 
 def FindUniqueId(dic):
   """Return a string not used as a key in the dictionary dic"""
@@ -551,10 +551,13 @@ class CsvUnicodeWriter:
     utf-8."""
     encoded_row = []
     for s in row:
-      if isinstance(s, unicode):
-        encoded_row.append(s.encode("utf-8"))
-      else:
-        encoded_row.append(s)
+      # if isinstance(s, unicode):
+      #   encoded_row.append(s.encode("utf-8"))
+      # else:
+      # assert isinstance(s, str), f'{type(s)} {s}'
+      # encoded_row.append(s.encode('utf-8'))
+      encoded_row.append(s)
+
     try:
       self.writer.writerow(encoded_row)
     except Exception as e:

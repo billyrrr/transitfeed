@@ -69,7 +69,7 @@ class GtfsObjectBase(GtfsFactoryUser):
 
   def iteritems(self):
     """Return a iterable for (name, value) pairs of public attributes."""
-    for name, value in self.__dict__.iteritems():
+    for name, value in self.__dict__.items():
       if (not name) or name[0] == "_":
         continue
       yield name, value

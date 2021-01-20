@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-from __future__ import absolute_import
+
+
 import codecs
 import csv
 import datetime
@@ -26,7 +26,7 @@ import re
 import socket
 import sys
 import time
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from . import errors
 from .version import __version__
@@ -89,7 +89,7 @@ or an email to the public group transitfeed@googlegroups.com. Sorry!
             dump.append(' --> %s' % line)
           else:
             dump.append('     %s' % line)
-      for local_name, local_val in frame_obj.f_locals.items():
+      for local_name, local_val in list(frame_obj.f_locals.items()):
         try:
           truncated_val = str(local_val)[0:500]
         except Exception as e:
@@ -110,7 +110,7 @@ or an email to the public group transitfeed@googlegroups.com. Sorry!
     print(apology)
 
     try:
-      raw_input('Press enter to continue...')
+      input('Press enter to continue...')
     except EOFError:
       # Ignore stdin being closed. This happens during some tests.
       pass
@@ -164,7 +164,7 @@ except:
         args = tuple()
       else:
         args = self.default_factory,
-      return type(self), args, None, None, self.items()
+      return type(self), args, None, None, list(self.items())
     def copy(self):
       return self.__copy__()
     def __copy__(self):
@@ -172,7 +172,7 @@ except:
     def __deepcopy__(self, memo):
       import copy
       return type(self)(self.default_factory,
-                        copy.deepcopy(self.items()))
+                        copy.deepcopy(list(self.items())))
     def __repr__(self):
       return 'defaultdict(%s, %s)' % (self.default_factory,
                                       dict.__repr__(self))
@@ -190,23 +190,23 @@ def CheckVersion(problems, latest_version=None):
   if not latest_version:
     timeout = 20
     socket.setdefaulttimeout(timeout)
-    request = urllib2.Request(LATEST_RELEASE_VERSION_URL)
+    request = urllib.request.Request(LATEST_RELEASE_VERSION_URL)
 
     try:
-      response = urllib2.urlopen(request)
+      response = urllib.request.urlopen(request)
       content = response.read()
       m = re.search(r'version=(\d+\.\d+\.\d+)', content)
       if m:
         latest_version = m.group(1)
 
-    except urllib2.HTTPError as e:
+    except urllib.error.HTTPError as e:
       description = ('During the new-version check, we failed to reach '
                      'transitfeed server: Reason: %s [%s].' %
                      (e.reason, e.code))
       problems.OtherProblem(
         description=description, type=errors.TYPE_NOTICE)
       return
-    except urllib2.URLError as e:
+    except urllib.error.URLError as e:
       description = ('During the new-version check, we failed to reach '
                      'transitfeed server. Reason: %s.' % e.reason)
       problems.OtherProblem(
@@ -250,7 +250,7 @@ def IsValidURL(url):
     - only checks whether the URL starts with 'http://' or 'https://'
   """
   # TODO: Add more thorough checking of URL
-  return url.startswith(u'http://') or url.startswith(u'https://')
+  return url.startswith('http://') or url.startswith('https://')
 
 def ValidateURL(url, column_name=None, problems=None):
   """
@@ -607,7 +607,7 @@ class EndOfLineChecker:
   def __iter__(self):
     return self
 
-  def next(self):
+  def __next__(self):
     """Return next line without end of line marker or raise StopIteration."""
     try:
       next_line = next(self._f)
@@ -638,7 +638,7 @@ class EndOfLineChecker:
         codecs.getencoder('string_escape')(m_eol.group())[0],
         (self._name, self._line_number))
     next_line_contents = next_line[0:m_eol.start()]
-    for seq, name in INVALID_LINE_SEPARATOR_UTF8.items():
+    for seq, name in list(INVALID_LINE_SEPARATOR_UTF8.items()):
       if next_line_contents.find(seq) != -1:
         self._problems.OtherProblem(
           "Line contains %s" % name,

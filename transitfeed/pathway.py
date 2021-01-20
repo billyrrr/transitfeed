@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
+
 from .gtfsobjectbase import GtfsObjectBase
 from . import problems as problems_module
 from . import util
@@ -76,7 +76,7 @@ class Pathway(GtfsObjectBase):
   def ValidatePathwayMode(self, problems):
     if not util.IsEmpty(self.pathway_mode):
       if (not isinstance(self.pathway_mode, int)) or \
-          (self.pathway_mode not in range(1, 8)):
+          (self.pathway_mode not in list(range(1, 8))):
         problems.InvalidValue('pathway_mode', self.pathway_mode)
         return False
     return True
@@ -122,13 +122,13 @@ class Pathway(GtfsObjectBase):
     return distance
 
   def ValidateFromStopIdIsValid(self, problems):
-    if self.from_stop_id not in self._schedule.stops.keys():
+    if self.from_stop_id not in list(self._schedule.stops.keys()):
       problems.InvalidValue('from_stop_id', self.from_stop_id)
       return False
     return True
 
   def ValidateToStopIdIsValid(self, problems):
-    if self.to_stop_id not in self._schedule.stops.keys():
+    if self.to_stop_id not in list(self._schedule.stops.keys()):
       problems.InvalidValue('to_stop_id', self.to_stop_id)
       return False
     return True

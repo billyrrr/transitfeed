@@ -75,6 +75,7 @@ class Schedule(object):
     # prohibits duplicate IDs this might be changed to a simple dict of
     # Transfers.
     self._transfers = defaultdict(lambda: [])
+    self._pathways = defaultdict(lambda: [])
     self._default_service_period = None
     self._default_agency = None
     if problem_reporter is None:
@@ -279,7 +280,7 @@ class Schedule(object):
     end_date in calendar.txt, a service exception of type add in
     calendar_dates.txt, or feed start/end date defined in feed_info.txt.
     """
-    period_list = self.GetServicePeriodList()
+    period_list = list(self.GetServicePeriodList())
     ranges = [period.GetDateRange() for period in period_list]
     starts = filter(lambda x: x, [item[0] for item in ranges])
     ends = filter(lambda x: x, [item[1] for item in ranges])
@@ -287,8 +288,8 @@ class Schedule(object):
     if not starts or not ends:
       return (None, None, None, None)
 
-    minvalue, minindex = min(itertools.izip(starts, itertools.count()))
-    maxvalue, maxindex = max(itertools.izip(ends, itertools.count()))
+    minvalue, minindex = min(zip(starts, itertools.count()))
+    maxvalue, maxindex = max(zip(ends, itertools.count()))
 
     minreason = (period_list[minindex].HasDateExceptionOn(minvalue) and
                  "earliest service exception date in calendar_dates.txt" or
@@ -565,16 +566,37 @@ class Schedule(object):
     self.AddTableColumns('transfers', transfer._ColumnNames())
     self._transfers[transfer_id].append(transfer)
 
+  def AddPathwayObject(self, pathway, problem_reporter=None):
+    assert pathway._schedule is None, "only add Transfer to a schedule once"
+    if not problem_reporter:
+      problem_reporter = self.problem_reporter
+
+    pathway_id = pathway._ID()
+
+    if pathway_id in self._transfers:
+      self.problem_reporter.DuplicateID(self._gtfs_factory.Transfer._ID_COLUMNS,
+                                        pathway_id,
+                                        type=problems_module.TYPE_WARNING)
+      # Duplicates are still added, while not prohibited by GTFS.
+
+    pathway._schedule = weakref.proxy(self)  # See weakref comment at top
+    self.AddTableColumns('pathways', pathway._ColumnNames())
+    self._pathways[pathway_id].append(pathway)
+
   def GetTransferIter(self):
     """Return an iterator for all Transfer objects in this schedule."""
     return itertools.chain(*self._transfers.values())
+
+  def GetPathwayIter(self):
+    """Return an iterator for all Transfer objects in this schedule."""
+    return itertools.chain(*self._pathways.values())
 
   def GetTransferList(self):
     """Return a list containing all Transfer objects in this schedule."""
     return list(self.GetTransferIter())
 
   def GetStop(self, id):
-    return self.stops[id]
+    return self.stops[int(id)]
 
   def GetFareZones(self):
     """Returns the list of all fare zones that have been identified by
@@ -764,6 +786,16 @@ class Schedule(object):
       for t in self.GetTransferIter():
         writer.writerow([util.EncodeUnicode(t[c]) for c in columns])
       self._WriteArchiveString(archive, 'transfers.txt', transfer_string)
+
+    if 'pathways' in self._table_columns:
+      pathway_string = StringIO()
+      writer = util.CsvUnicodeWriter(pathway_string)
+      columns = self.GetTableColumns('pathways')
+      writer.writerow(columns)
+      for t in self.GetPathwayIter():
+        writer.writerow([util.EncodeUnicode(t[c]) for c in columns])
+      self._WriteArchiveString(archive, 'pathways.txt', pathway_string)
+
 
     archive.close()
 
@@ -1029,8 +1061,8 @@ class Schedule(object):
     # each pair of stations within 2 meters latitude of each other. This avoids
     # doing n^2 comparisons in the average case and doesn't need a spatial
     # index.
-    sorted_stops = filter(lambda s: s.stop_lat and s.stop_lon,
-                          self.GetStopList())
+    sorted_stops = list(filter(lambda s: s.stop_lat and s.stop_lon,
+                          self.GetStopList()))
     sorted_stops.sort(
         key=(lambda x: [x.stop_lat, x.stop_lon, getattr(x, 'stop_id', None)]))
     TWO_METERS_LAT = 0.000018
@@ -1104,7 +1136,7 @@ class Schedule(object):
     # (trip_id, first_arrival_secs, last_arrival_secs)
     trip_intervals_by_block_id = defaultdict(lambda: [])
 
-    for trip in sorted(self.trips.values()):
+    for trip in sorted(self.trips.values(), key=lambda e: e.GetStartTime()):
       if trip.route_id not in self.routes:
         continue
       route_type = self.GetRoute(trip.route_id).route_type

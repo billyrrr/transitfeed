@@ -22,6 +22,7 @@ from .feedinfo import FeedInfo
 from .frequency import Frequency
 from .loader import Loader
 from . import problems
+from .pathway import Pathway
 from .route import Route
 from .schedule import Schedule
 from .serviceperiod import ServicePeriod
@@ -54,7 +55,8 @@ class GtfsFactory(object):
       'Transfer': Transfer,
       'Trip': Trip,
       'Schedule': Schedule,
-      'Loader': Loader
+      'Loader': Loader,
+      'Pathway': Pathway
     }
 
     self._file_mapping = {
@@ -96,6 +98,8 @@ class GtfsFactory(object):
 
         'trips.txt': { 'required': True, 'loading_order': 40,
                        'classes': ['Trip']},
+        'pathways.txt': {'required': False, 'loading_order': 30,
+                          'classes': ['Pathway']},
 
         }
 

@@ -317,9 +317,26 @@ class ProblemReporter(object):
                                     context2=self._context, type=type)
     self.AddToAccumulator(e)
 
-  def OtherProblem(self, description, context=None, type=TYPE_ERROR):
+def PathwayDistanceTooBig(self, from_stop_id, to_stop_id, distance,
+                          context=None, type=TYPE_ERROR):
+    e = PathwayDistanceTooBig(from_stop_id=from_stop_id, to_stop_id=to_stop_id,
+                              distance=distance, context=context,
+                              context2=self._context, type=type)
+    self.AddToAccumulator(e)
+
+def PathwayWalkingSpeedTooFast(self, from_stop_id, to_stop_id, distance,
+                               transfer_time, context=None,
+                               type=TYPE_WARNING):
+    e = PathwayWalkingSpeedTooFast(from_stop_id=from_stop_id,
+                                   transfer_time=transfer_time,
+                                   distance=distance,
+                                   to_stop_id=to_stop_id, context=context,
+                                   context2=self._context, type=type)
+    self.AddToAccumulator(e)
+
+def OtherProblem(self, description, context=None, type=TYPE_ERROR):
     e = OtherProblem(description=description,
-                    context=context, context2=self._context, type=type)
+                     context=context, context2=self._context, type=type)
     self.AddToAccumulator(e)
 
   def TooManyDaysWithoutService(self,
@@ -343,6 +360,14 @@ class ProblemReporter(object):
                                                     type=TYPE_ERROR):
     e = MinimumTransferTimeSetWithInvalidTransferType(context=context,
         context2=self._context, transfer_type=transfer_type, type=type)
+    self.AddToAccumulator(e)
+
+def TraversalTimeWithInvalidPathwayMode(self,
+                                        pathway_mode=None,
+                                        context=None,
+                                        type=TYPE_ERROR):
+    e = TraversalTimeWithInvalidPathwayMode(context=context,
+                                            context2=self._context, pathway_mode=pathway_mode, type=type)
     self.AddToAccumulator(e)
 
 
